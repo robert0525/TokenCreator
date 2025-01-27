@@ -1,3 +1,11 @@
+/* Basic Reset */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* Body Styling */
 body {
     font-family: Arial, sans-serif;
     background-color: #f4f4f4;
@@ -5,6 +13,7 @@ body {
     padding: 0;
 }
 
+/* Header Styling */
 header {
     background-color: #333;
     color: #fff;
@@ -12,10 +21,12 @@ header {
     text-align: center;
 }
 
+/* Main Content */
 main {
     padding: 20px;
 }
 
+/* Token Form Styling */
 .token-form {
     background-color: #fff;
     padding: 20px;
@@ -23,6 +34,7 @@ main {
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
+/* Form Inputs Styling */
 .token-form label {
     display: block;
     margin-bottom: 8px;
@@ -36,6 +48,7 @@ main {
     border: 1px solid #ccc;
 }
 
+/* Button Styling */
 .token-form button {
     width: 100%;
     padding: 12px;
@@ -46,6 +59,7 @@ main {
     font-size: 16px;
 }
 
+/* Footer Styling */
 footer {
     background-color: #333;
     color: #fff;
@@ -54,4 +68,26 @@ footer {
     position: fixed;
     bottom: 0;
     width: 100%;
+}
+
+/* Mobile Devices (max-width: 600px) */
+@media (max-width: 600px) {
+    header {
+        padding: 15px; /* Reduce padding for smaller screens */
+    }
+
+    .token-form {
+        padding: 15px; /* Adjust form padding */
+    }
+
+    .token-form button {
+        padding: 14px; /* Make button more touch-friendly */
+    }
+}
+
+/* Tablets and Small Desktops (min-width: 601px) */
+@media (min-width: 601px) and (max-width: 1024px) {
+    .token-form {
+        padding: 25px; /* Slightly larger padding for medium screens */
+    }
 }
