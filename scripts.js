@@ -8,6 +8,28 @@ document.getElementById('create-token-form').addEventListener('submit', function
     const tokenSymbol = document.getElementById('token-symbol').value;
     const totalSupply = document.getElementById('total-supply').value;
 
-    // Display the information in an alert (for testing purposes)
-    alert(`Token Created!\nName: ${tokenName}\nSymbol: ${tokenSymbol}\nTotal Supply: ${totalSupply}`);
+    // Prepare data to send to the Netlify function
+    const requestData = {
+        tokenName: tokenName,
+        tokenSymbol: tokenSymbol,
+        totalSupply: totalSupply
+    };
+
+    // Send the data via a POST request to the Netlify function
+    fetch('/.netlify/functions/createToken', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(requestData)
+    })
+    .then(response => response.json())
+    .then(data => {
+        // Show the success message returned from the function
+        alert(data.message);
+    })
+    .catch(error => {
+        // Handle any errors
+        alert('Error creating token: ' + error);
+    });
 });
