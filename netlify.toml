@@ -1,9 +1,3 @@
 [build]
   functions = "functions"
   publish = "."
-
-[[redirects]]
-  from = "/createToken"
-  to = "/functions/createToken"
-  status = 200
-  force = true
