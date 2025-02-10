@@ -1,0 +1,24 @@
+{
+  "name": "tokencreator",
+  "version": "1.0.0",
+  "description": "",
+  "main": "scripts.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/robert0525/TokenCreator.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/robert0525/TokenCreator/issues"
+  },
+  "homepage": "https://github.com/robert0525/TokenCreator#readme",
+  "dependencies": {
+    "@solana/spl-token": "^0.4.12",
+    "@solana/web3.js": "^1.98.0"
+  }
+}
