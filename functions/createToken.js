@@ -14,13 +14,17 @@ exports.handler = async (event, context) => {
 
         // Parse form data
         const { tokenName, tokenSymbol, totalSupply } = JSON.parse(event.body);
+        console.log("Parsed event body:", { tokenName, tokenSymbol, totalSupply });
 
         // Solana connection
         const connection = new Connection(clusterApiUrl("devnet"), "confirmed");
 
         // Load wallet from private key
         const secretKeyArray = JSON.parse(process.env.SOLANA_PRIVATE_KEY);
+        console.log("Loaded Secret Key:", secretKeyArray);  // Debug log
+
         const wallet = Keypair.fromSecretKey(Uint8Array.from(secretKeyArray));
+        console.log("Wallet Public Key:", wallet.publicKey.toBase58());  // Debug log
 
         // Create a new token mint
         const mint = await createMint(
@@ -30,6 +34,7 @@ exports.handler = async (event, context) => {
             null,
             9
         );
+        console.log("Mint Address:", mint.toBase58());  // Debug log
 
         // Create token account
         const tokenAccount = await getOrCreateAssociatedTokenAccount(
@@ -38,6 +43,7 @@ exports.handler = async (event, context) => {
             mint,
             wallet.publicKey
         );
+        console.log("Token Account Address:", tokenAccount.address.toBase58());  // Debug log
 
         // Mint tokens
         await mintTo(
@@ -48,6 +54,7 @@ exports.handler = async (event, context) => {
             wallet.publicKey,
             totalSupply * Math.pow(10, 9)
         );
+        console.log(`Successfully minted ${totalSupply} tokens to ${tokenAccount.address.toBase58()}`);
 
         return {
             statusCode: 200,
