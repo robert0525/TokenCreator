@@ -6,6 +6,9 @@ document.getElementById('create-token-form').addEventListener('submit', async fu
     const tokenSymbol = document.getElementById('token-symbol').value;
     const totalSupply = document.getElementById('total-supply').value;
     const imageFile = document.getElementById('image-upload').files[0];
+    const projectWebsite = document.getElementById('project-website').value;
+    const twitterLink = document.getElementById('twitter-link').value;
+    const telegramLink = document.getElementById('telegram-link').value;
 
     if (!imageFile) {
         alert("Please upload a token image.");
@@ -24,7 +27,10 @@ document.getElementById('create-token-form').addEventListener('submit', async fu
         tokenName: tokenName,
         tokenSymbol: tokenSymbol,
         totalSupply: totalSupply,
-        imageUrl: imageUrl  // Using uploaded image URL
+        imageUrl: imageUrl,  // Uploaded image URL
+        projectWebsite: projectWebsite,
+        twitterLink: twitterLink,
+        telegramLink: telegramLink
     };
 
     // Send request to Netlify function
@@ -41,25 +47,3 @@ document.getElementById('create-token-form').addEventListener('submit', async fu
         alert('Error creating token: ' + error);
     });
 });
-
-// Function to upload image to IPFS (example using Pinata API)
-async function uploadImageToIPFS(file) {
-    const formData = new FormData();
-    formData.append("file", file);
-
-    try {
-        const response = await fetch('https://api.pinata.cloud/pinning/pinFileToIPFS', {
-            method: 'POST',
-            headers: {
-                'Authorization': 'Bearer YOUR_PINATA_API_KEY' // Replace with your API key
-            },
-            body: formData
-        });
-
-        const data = await response.json();
-        return `https://ipfs.io/ipfs/${data.IpfsHash}`; // Return IPFS URL
-    } catch (error) {
-        console.error('Image upload failed:', error);
-        return null;
-    }
-}
