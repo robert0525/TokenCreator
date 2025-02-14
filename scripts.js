@@ -1,5 +1,11 @@
 document.addEventListener("DOMContentLoaded", () => {
-    const form = document.getElementById("create-token-form");
+    const form = document.getElementById("token-form");
+
+
+    if (!form) {
+        console.error("🚨 ERROR: Form with ID 'create-token-form' not found! Check your HTML.");
+        return;
+    }
 
     form.addEventListener("submit", async function (event) {
         event.preventDefault();
@@ -38,7 +44,7 @@ document.addEventListener("DOMContentLoaded", () => {
             telegramLink: telegramLink,
         };
 
-        console.log("Sending token data to server:", tokenData);
+        console.log("✅ Sending token data to server:", tokenData);
 
         try {
             // Send request to Netlify function
@@ -51,14 +57,14 @@ document.addEventListener("DOMContentLoaded", () => {
             const responseData = await response.json();
 
             if (response.ok) {
-                alert(`Token Created Successfully! Mint Address: ${responseData.mintAddress}`);
-                console.log("Token creation response:", responseData);
+                alert(`🎉 Token Created Successfully! Mint Address: ${responseData.mintAddress}`);
+                console.log("✅ Token creation response:", responseData);
             } else {
                 throw new Error(responseData.error || "Unknown error occurred.");
             }
         } catch (error) {
-            console.error("Error creating token:", error);
-            alert("Failed to create token. Check the console for details.");
+            console.error("❌ Error creating token:", error);
+            alert("⚠️ Failed to create token. Check the console for details.");
         }
     });
 });
@@ -80,7 +86,7 @@ async function uploadImageToIPFS(imageFile) {
         const data = await response.json();
         return `https://ipfs.io/ipfs/${data.IpfsHash}`;
     } catch (error) {
-        console.error("IPFS Upload Failed:", error);
+        console.error("❌ IPFS Upload Failed:", error);
         return null;
     }
 }
