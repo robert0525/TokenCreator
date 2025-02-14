@@ -1,73 +1,46 @@
 document.addEventListener("DOMContentLoaded", () => {
     const form = document.getElementById("token-form");
 
-
     if (!form) {
-        console.error("🚨 ERROR: Form with ID 'create-token-form' not found! Check your HTML.");
+        console.error("🚨 ERROR: Form with ID 'token-form' not found! Check your HTML.");
         return;
     }
 
-    form.addEventListener("submit", async function (event) {
+    form.addEventListener("submit", async (event) => {
         event.preventDefault();
 
-        // Get values from input fields
-        const tokenName = document.getElementById("token-name").value;
-        const tokenSymbol = document.getElementById("token-symbol").value;
-        const decimals = document.getElementById("decimals").value;
-        const totalSupply = document.getElementById("total-supply").value;
-        const imageFile = document.getElementById("token-image").files[0];
-        const projectWebsite = document.getElementById("project-website").value;
-        const twitterLink = document.getElementById("twitter-link").value;
-        const telegramLink = document.getElementById("telegram-link").value;
+        // Get form fields safely
+        const tokenNameEl = document.getElementById("token-name");
+        const tokenSymbolEl = document.getElementById("token-symbol");
+        const decimalsEl = document.getElementById("decimals");
+        const supplyEl = document.getElementById("supply");
+        const tokenImageEl = document.getElementById("token-image");
 
-        if (!imageFile) {
-            alert("Please upload a token image.");
+        if (!tokenNameEl || !tokenSymbolEl || !decimalsEl || !supplyEl || !tokenImageEl) {
+            console.error("🚨 ERROR: One or more input fields are missing in the HTML!");
             return;
         }
 
-        // Upload the image to IPFS (Replace this function with actual API call)
-        const imageUrl = await uploadImageToIPFS(imageFile);
-        if (!imageUrl) {
-            alert("Failed to upload image.");
-            return;
-        }
-
-        // Prepare token data
         const tokenData = {
-            name: tokenName,
-            symbol: tokenSymbol,
-            decimals: parseInt(decimals),
-            supply: parseInt(totalSupply),
-            imageUrl: imageUrl,
-            projectWebsite: projectWebsite,
-            twitterLink: twitterLink,
-            telegramLink: telegramLink,
+            name: tokenNameEl.value,
+            symbol: tokenSymbolEl.value,
+            decimals: parseInt(decimalsEl.value),
+            supply: parseInt(supplyEl.value),
+            image: tokenImageEl.files[0]
         };
 
-        console.log("✅ Sending token data to server:", tokenData);
+        console.log("✅ Token Data:", tokenData);
 
         try {
-            // Send request to Netlify function
-            const response = await fetch("/.netlify/functions/createToken", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(tokenData),
-            });
-
-            const responseData = await response.json();
-
-            if (response.ok) {
-                alert(`🎉 Token Created Successfully! Mint Address: ${responseData.mintAddress}`);
-                console.log("✅ Token creation response:", responseData);
-            } else {
-                throw new Error(responseData.error || "Unknown error occurred.");
-            }
+            const response = await createToken(tokenData);
+            alert(`🎉 Token Created Successfully: ${response.txId}`);
         } catch (error) {
             console.error("❌ Error creating token:", error);
-            alert("⚠️ Failed to create token. Check the console for details.");
+            alert("⚠️ Failed to create token. Check console for details.");
         }
     });
 });
+
 
 // Function to upload image to IPFS (Dummy implementation, replace with actual API)
 async function uploadImageToIPFS(imageFile) {
