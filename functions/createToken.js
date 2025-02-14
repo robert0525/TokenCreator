@@ -27,8 +27,8 @@ exports.handler = async (event, context) => {
         console.log("Function triggered!");
 
         // Parse form data
-        const { tokenName, tokenSymbol, totalSupply, imageUrl } = JSON.parse(event.body);
-        console.log("Parsed event body:", { tokenName, tokenSymbol, totalSupply, imageUrl });
+        const { tokenName, tokenSymbol, totalSupply, imageUrl, projectWebsite, twitterLink, telegramLink } = JSON.parse(event.body);
+        console.log("Parsed event body:", { tokenName, tokenSymbol, totalSupply, imageUrl, projectWebsite, twitterLink, telegramLink });
 
         // Solana connection
         const connection = new Connection(clusterApiUrl("devnet"), "confirmed");
@@ -75,11 +75,20 @@ exports.handler = async (event, context) => {
         const metadata = {
             name: tokenName,
             symbol: tokenSymbol,
-            uri: imageUrl,  // Make sure to replace with actual JSON metadata file
+            uri: imageUrl,  // Metadata URI (update later with a JSON metadata file)
             sellerFeeBasisPoints: 0,
             creators: null,
             collection: null,
             uses: null,
+            external_url: projectWebsite || "",  // Store project website in metadata (optional)
+            properties: {
+                category: "token",
+                files: [{ uri: imageUrl, type: "image/png" }],
+                socialLinks: {
+                    twitter: twitterLink || "",  // Optional social links
+                    telegram: telegramLink || ""
+                }
+            }
         };
 
         // Create metadata account
