@@ -1,6 +1,7 @@
-const fetch = require("node-fetch");
+const solanaWeb3 = require("@solana/web3.js");
+const { Keypair, Connection, LAMPORTS_PER_SOL } = solanaWeb3;
 
-exports.handler = async function (event, context) {
+exports.handler = async function (event) {
     try {
         if (event.httpMethod !== "POST") {
             return {
@@ -9,10 +10,9 @@ exports.handler = async function (event, context) {
             };
         }
 
-        // Parse the incoming request data
+        // Parse incoming request
         const requestData = JSON.parse(event.body);
-
-        const { name, symbol, decimals, supply, imageUrl, projectWebsite, twitterLink, telegramLink } = requestData;
+        const { name, symbol, decimals, supply } = requestData;
 
         if (!name || !symbol || !decimals || !supply) {
             return {
@@ -21,26 +21,25 @@ exports.handler = async function (event, context) {
             };
         }
 
-        // Simulate token creation logic (replace with actual blockchain interaction)
-        const mintAddress = `SIMULATED_MINT_ADDRESS_${Date.now()}`;
+        // Connect to Solana Devnet (for testing, change to 'mainnet-beta' for live)
+        const connection = new Connection("https://api.devnet.solana.com", "confirmed");
+
+        // Create a new keypair for the mint account
+        const mint = Keypair.generate();
+
+        // Airdrop SOL to the mint address (required for transaction fees)
+        const airdropSignature = await connection.requestAirdrop(mint.publicKey, LAMPORTS_PER_SOL);
+        await connection.confirmTransaction(airdropSignature);
 
         return {
             statusCode: 200,
             body: JSON.stringify({
                 message: "Token Created Successfully",
-                mintAddress: mintAddress,
-                details: {
-                    name,
-                    symbol,
-                    decimals,
-                    supply,
-                    imageUrl,
-                    projectWebsite,
-                    twitterLink,
-                    telegramLink,
-                },
-            }),
+                mintAddress: mint.publicKey.toBase58(), // Real Solana Mint Address
+                details: { name, symbol, decimals, supply }
+            })
         };
+
     } catch (error) {
         console.error("Server Error:", error);
         return {
