@@ -1,86 +1,51 @@
-document.addEventListener("DOMContentLoaded", () => {
-    const form = document.getElementById("create-token-form");
+const fetch = require("node-fetch");
 
-    form.addEventListener("submit", async function(event) {
-        event.preventDefault();
-
-        // Get values from input fields
-        const tokenName = document.getElementById("token-name").value;
-        const tokenSymbol = document.getElementById("token-symbol").value;
-        const decimals = document.getElementById("decimals").value;
-        const totalSupply = document.getElementById("total-supply").value;
-        const imageFile = document.getElementById("token-image").files[0];
-        const projectWebsite = document.getElementById("project-website").value;
-        const twitterLink = document.getElementById("twitter-link").value;
-        const telegramLink = document.getElementById("telegram-link").value;
-
-        if (!imageFile) {
-            alert("Please upload a token image.");
-            return;
-        }
-
-        // Upload the image to IPFS
-        const imageUrl = await uploadImageToIPFS(imageFile);
-        if (!imageUrl) {
-            alert("Failed to upload image.");
-            return;
-        }
-
-        // Prepare token data
-        const tokenData = {
-            name: tokenName,
-            symbol: tokenSymbol,
-            decimals: parseInt(decimals),
-            supply: parseInt(totalSupply),
-            imageUrl: imageUrl,  // Uploaded image URL
-            projectWebsite: projectWebsite,
-            twitterLink: twitterLink,
-            telegramLink: telegramLink
-        };
-
-        console.log("Token Data:", tokenData);
-
-        try {
-            // Send request to Netlify function
-            const response = await fetch('/.netlify/functions/createToken', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(tokenData)
-            });
-
-            const responseData = await response.json();
-            
-            if (response.ok) {
-                alert(`Token Created Successfully! Mint Address: ${responseData.mintAddress}`);
-                console.log("Token creation response:", responseData);
-            } else {
-                throw new Error(responseData.error || "Unknown error occurred.");
-            }
-        } catch (error) {
-            console.error("Error creating token:", error);
-            alert("Failed to create token. Check the console for details.");
-        }
-    });
-});
-
-// Function to upload image to IPFS (Dummy implementation, replace with actual API)
-async function uploadImageToIPFS(imageFile) {
+exports.handler = async function (event, context) {
     try {
-        const formData = new FormData();
-        formData.append("file", imageFile);
+        if (event.httpMethod !== "POST") {
+            return {
+                statusCode: 405,
+                body: JSON.stringify({ error: "Method Not Allowed" }),
+            };
+        }
 
-        const response = await fetch("https://api.pinata.cloud/pinning/pinFileToIPFS", {
-            method: "POST",
-            headers: {
-                "Authorization": `Bearer YOUR_PINATA_API_KEY`
-            },
-            body: formData
-        });
+        // Parse the incoming request data
+        const requestData = JSON.parse(event.body);
 
-        const data = await response.json();
-        return `https://ipfs.io/ipfs/${data.IpfsHash}`;
+        const { name, symbol, decimals, supply, imageUrl, projectWebsite, twitterLink, telegramLink } = requestData;
+
+        if (!name || !symbol || !decimals || !supply) {
+            return {
+                statusCode: 400,
+                body: JSON.stringify({ error: "Missing required fields." }),
+            };
+        }
+
+        // Simulate token creation logic (replace with actual blockchain interaction)
+        const mintAddress = `SIMULATED_MINT_ADDRESS_${Date.now()}`;
+
+        return {
+            statusCode: 200,
+            body: JSON.stringify({
+                message: "Token Created Successfully",
+                mintAddress: mintAddress,
+                details: {
+                    name,
+                    symbol,
+                    decimals,
+                    supply,
+                    imageUrl,
+                    projectWebsite,
+                    twitterLink,
+                    telegramLink,
+                },
+            }),
+        };
     } catch (error) {
-        console.error("IPFS Upload Failed:", error);
-        return null;
+        console.error("Server Error:", error);
+        return {
+            statusCode: 500,
+            body: JSON.stringify({ error: "Internal Server Error" }),
+        };
     }
-}
+};
