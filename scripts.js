@@ -7,14 +7,16 @@ document.getElementById('create-token-form').addEventListener('submit', async fu
     const totalSupply = document.getElementById('total-supply').value;
     const imageFile = document.getElementById('image-upload').files[0];
 
-    let imageUrl = document.getElementById('token-image').value; // Default to entered URL
+    if (!imageFile) {
+        alert("Please upload a token image.");
+        return;
+    }
 
-    // If user uploaded an image, upload it to IPFS or Arweave
-    if (imageFile) {
-        const uploadedUrl = await uploadImageToIPFS(imageFile);
-        if (uploadedUrl) {
-            imageUrl = uploadedUrl;
-        }
+    // Upload the image to IPFS
+    const imageUrl = await uploadImageToIPFS(imageFile);
+    if (!imageUrl) {
+        alert("Failed to upload image.");
+        return;
     }
 
     // Prepare request data
@@ -22,7 +24,7 @@ document.getElementById('create-token-form').addEventListener('submit', async fu
         tokenName: tokenName,
         tokenSymbol: tokenSymbol,
         totalSupply: totalSupply,
-        imageUrl: imageUrl
+        imageUrl: imageUrl  // Using uploaded image URL
     };
 
     // Send request to Netlify function
