@@ -8,13 +8,15 @@
 </head>
 <body>
     <header>
-        <h1>Welcome to the Token Creator</h1>
+        <nav class="navbar">
+            <h1>Token Creator</h1>
+            <button class="connect-wallet">Select Wallet</button>
+        </nav>
     </header>
-
-    <main>
-        <section class="token-form">
+    
+    <main class="container">
+        <section class="form-section">
             <h2>Create Your Token</h2>
-            <!-- Add action="#" to prevent default form submission behavior -->
             <form id="create-token-form" action="#">
                 <label for="token-name">Token Name:</label>
                 <input type="text" id="token-name" name="token-name" required>
@@ -39,8 +41,20 @@
             
                 <button type="submit">Create Token</button>
             </form>
-            
-            
+        </section>
+
+        <section class="info-section">
+            <h2>How to Use Token Creator</h2>
+            <ol>
+                <li>Connect your Solana wallet.</li>
+                <li>Specify the desired name for your Token.</li>
+                <li>Indicate the symbol (max 8 characters).</li>
+                <li>Select the decimals quantity (default: 6).</li>
+                <li>Provide a brief description for your token.</li>
+                <li>Upload the token image (PNG).</li>
+                <li>Set the supply of your token.</li>
+                <li>Click "Create" and confirm the transaction.</li>
+            </ol>
         </section>
     </main>
 
