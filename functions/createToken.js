@@ -1,128 +1,86 @@
-const { Connection, Keypair, clusterApiUrl, PublicKey, Transaction, sendAndConfirmTransaction, SystemProgram } = require("@solana/web3.js");
-const { createMint, getOrCreateAssociatedTokenAccount, mintTo } = require("@solana/spl-token");
+document.addEventListener("DOMContentLoaded", () => {
+    const form = document.getElementById("create-token-form");
 
-const TOKEN_METADATA_PROGRAM_ID = new PublicKey("metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s");
+    form.addEventListener("submit", async function(event) {
+        event.preventDefault();
 
-// Function to get Metadata PDA
-async function getMetadataPDA(mint) {
-    return PublicKey.findProgramAddressSync(
-        [
-            Buffer.from("metadata"),
-            TOKEN_METADATA_PROGRAM_ID.toBuffer(),
-            mint.toBuffer()
-        ],
-        TOKEN_METADATA_PROGRAM_ID
-    )[0];
-}
+        // Get values from input fields
+        const tokenName = document.getElementById("token-name").value;
+        const tokenSymbol = document.getElementById("token-symbol").value;
+        const decimals = document.getElementById("decimals").value;
+        const totalSupply = document.getElementById("total-supply").value;
+        const imageFile = document.getElementById("token-image").files[0];
+        const projectWebsite = document.getElementById("project-website").value;
+        const twitterLink = document.getElementById("twitter-link").value;
+        const telegramLink = document.getElementById("telegram-link").value;
 
-exports.handler = async (event, context) => {
-    if (event.httpMethod !== "POST") {
-        return {
-            statusCode: 405,
-            body: JSON.stringify({ error: "Method Not Allowed" }),
-        };
-    }
+        if (!imageFile) {
+            alert("Please upload a token image.");
+            return;
+        }
 
-    try {
-        console.log("Function triggered!");
+        // Upload the image to IPFS
+        const imageUrl = await uploadImageToIPFS(imageFile);
+        if (!imageUrl) {
+            alert("Failed to upload image.");
+            return;
+        }
 
-        // Parse form data
-        const { tokenName, tokenSymbol, totalSupply, imageUrl, projectWebsite, twitterLink, telegramLink } = JSON.parse(event.body);
-        console.log("Parsed event body:", { tokenName, tokenSymbol, totalSupply, imageUrl, projectWebsite, twitterLink, telegramLink });
-
-        // Solana connection
-        const connection = new Connection(clusterApiUrl("devnet"), "confirmed");
-
-        // Load wallet from private key
-        const secretKeyArray = JSON.parse(process.env.SOLANA_PRIVATE_KEY);
-        const wallet = Keypair.fromSecretKey(Uint8Array.from(secretKeyArray));
-        console.log("Wallet Public Key:", wallet.publicKey.toBase58());
-
-        // Create a new token mint
-        const mint = await createMint(
-            connection,
-            wallet,
-            wallet.publicKey,
-            null,
-            9
-        );
-        console.log("Mint Address:", mint.toBase58());
-
-        // Create token account
-        const tokenAccount = await getOrCreateAssociatedTokenAccount(
-            connection,
-            wallet,
-            mint,
-            wallet.publicKey
-        );
-        console.log("Token Account Address:", tokenAccount.address.toBase58());
-
-        // Mint tokens
-        await mintTo(
-            connection,
-            wallet,
-            mint,
-            tokenAccount.address,
-            wallet.publicKey,
-            totalSupply * Math.pow(10, 9)
-        );
-        console.log(`Successfully minted ${totalSupply} tokens to ${tokenAccount.address.toBase58()}`);
-
-        // Get metadata PDA
-        const metadataPDA = await getMetadataPDA(mint);
-
-        // Define metadata
-        const metadata = {
+        // Prepare token data
+        const tokenData = {
             name: tokenName,
             symbol: tokenSymbol,
-            uri: imageUrl,  // Metadata URI (update later with a JSON metadata file)
-            sellerFeeBasisPoints: 0,
-            creators: null,
-            collection: null,
-            uses: null,
-            external_url: projectWebsite || "",  // Store project website in metadata (optional)
-            properties: {
-                category: "token",
-                files: [{ uri: imageUrl, type: "image/png" }],
-                socialLinks: {
-                    twitter: twitterLink || "",  // Optional social links
-                    telegram: telegramLink || ""
-                }
+            decimals: parseInt(decimals),
+            supply: parseInt(totalSupply),
+            imageUrl: imageUrl,  // Uploaded image URL
+            projectWebsite: projectWebsite,
+            twitterLink: twitterLink,
+            telegramLink: telegramLink
+        };
+
+        console.log("Token Data:", tokenData);
+
+        try {
+            // Send request to Netlify function
+            const response = await fetch('/.netlify/functions/createToken', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(tokenData)
+            });
+
+            const responseData = await response.json();
+            
+            if (response.ok) {
+                alert(`Token Created Successfully! Mint Address: ${responseData.mintAddress}`);
+                console.log("Token creation response:", responseData);
+            } else {
+                throw new Error(responseData.error || "Unknown error occurred.");
             }
-        };
+        } catch (error) {
+            console.error("Error creating token:", error);
+            alert("Failed to create token. Check the console for details.");
+        }
+    });
+});
 
-        // Create metadata account
-        const transaction = new Transaction().add(
-            SystemProgram.createAccount({
-                fromPubkey: wallet.publicKey,
-                newAccountPubkey: metadataPDA,
-                space: 300,
-                lamports: await connection.getMinimumBalanceForRentExemption(300),
-                programId: TOKEN_METADATA_PROGRAM_ID,
-            })
-        );
+// Function to upload image to IPFS (Dummy implementation, replace with actual API)
+async function uploadImageToIPFS(imageFile) {
+    try {
+        const formData = new FormData();
+        formData.append("file", imageFile);
 
-        await sendAndConfirmTransaction(connection, transaction, [wallet]);
-        console.log("Metadata account created successfully!");
+        const response = await fetch("https://api.pinata.cloud/pinning/pinFileToIPFS", {
+            method: "POST",
+            headers: {
+                "Authorization": `Bearer YOUR_PINATA_API_KEY`
+            },
+            body: formData
+        });
 
-        return {
-            statusCode: 200,
-            body: JSON.stringify({
-                message: "Token created successfully!",
-                mintAddress: mint.toBase58(),
-                tokenAccount: tokenAccount.address.toBase58(),
-                metadataPDA: metadataPDA.toBase58(),
-                totalSupply,
-            }),
-        };
+        const data = await response.json();
+        return `https://ipfs.io/ipfs/${data.IpfsHash}`;
     } catch (error) {
-        console.error("Error creating token:", error);
-        return {
-            statusCode: 500,
-            body: JSON.stringify({
-                error: "Failed to create token",
-                details: error.message,
-            }),
-        };
+        console.error("IPFS Upload Failed:", error);
+        return null;
     }
-};
+}

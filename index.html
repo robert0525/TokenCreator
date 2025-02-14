@@ -3,65 +3,70 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Token Creator</title>
+    <title>Solana Token Creator</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <header>
-        <nav class="navbar">
-            <h1>Token Creator</h1>
-            <button class="connect-wallet">Select Wallet</button>
-        </nav>
+    <header class="sticky-header">
+        <h1>Solana Token Creator</h1>
     </header>
-    
-    <main class="container">
-        <section class="form-section">
-            <h2>Create Your Token</h2>
-            <form id="create-token-form" action="#">
-                <label for="token-name">Token Name:</label>
-                <input type="text" id="token-name" name="token-name" required>
-            
-                <label for="token-symbol">Token Symbol:</label>
-                <input type="text" id="token-symbol" name="token-symbol" required>
-            
-                <label for="total-supply">Total Supply:</label>
-                <input type="number" id="total-supply" name="total-supply" required>
-            
-                <label for="image-upload">Upload Token Image:</label>
-                <input type="file" id="image-upload" accept="image/*" required>
-            
-                <label for="project-website">Project Website:</label>
-                <input type="url" id="project-website" name="project-website" placeholder="https://yourproject.com">
-            
-                <label for="twitter-link">X (Twitter) Link:</label>
-                <input type="url" id="twitter-link" name="twitter-link" placeholder="https://twitter.com/yourhandle">
-            
-                <label for="telegram-link">Telegram Group:</label>
-                <input type="url" id="telegram-link" name="telegram-link" placeholder="https://t.me/yourgroup">
-            
-                <button type="submit">Create Token</button>
-            </form>
-        </section>
 
+    <div class="container">
+        <!-- Left Side: Information -->
         <section class="info-section">
-            <h2>How to Use Token Creator</h2>
-            <ol>
-                <li>Connect your Solana wallet.</li>
-                <li>Specify the desired name for your Token.</li>
-                <li>Indicate the symbol (max 8 characters).</li>
-                <li>Select the decimals quantity (default: 6).</li>
-                <li>Provide a brief description for your token.</li>
-                <li>Upload the token image (PNG).</li>
-                <li>Set the supply of your token.</li>
-                <li>Click "Create" and confirm the transaction.</li>
-            </ol>
+            <h2>Create Your Own Token</h2>
+            <p>Easily generate a Solana SPL token in just a few steps. No coding required!</p>
+            <h3>How It Works:</h3>
+            <ul>
+                <li>1. Connect your Solana wallet</li>
+                <li>2. Specify token name and symbol</li>
+                <li>3. Set token supply and decimal precision</li>
+                <li>4. Upload an optional token image</li>
+                <li>5. Confirm and deploy your token</li>
+            </ul>
+            <p>Start your journey today!</p>
         </section>
-    </main>
 
-    <footer>
-        <p>Powered by TokenCreator</p>
-    </footer>
+        <!-- Right Side: Form & Sidebar -->
+        <div class="right-section">
+            <!-- Token Creation Form -->
+            <section class="form-section">
+                <h2>Token Details</h2>
+                <form id="token-form">
+                    <label for="token-name">Name:</label>
+                    <input type="text" id="token-name" name="token-name" placeholder="Enter token name">
+                    
+                    <label for="token-symbol">Symbol:</label>
+                    <input type="text" id="token-symbol" name="token-symbol" placeholder="e.g., SOLT">
+                    
+                    <label for="decimals">Decimals:</label>
+                    <input type="number" id="decimals" name="decimals" min="0" max="9" value="6">
+                    
+                    <label for="supply">Supply:</label>
+                    <input type="number" id="supply" name="supply" placeholder="Total supply">
+                    
+                    <label for="token-image">Upload Image:</label>
+                    <input type="file" id="token-image" name="token-image" accept="image/*">
 
+                    <button type="submit">Create Token</button>
+                </form>
+            </section>
+
+            <!-- Sidebar (Now on the Right) -->
+            <aside class="sidebar">
+                <nav>
+                    <ul>
+                        <li><a href="#">Token Creator</a></li>
+                        <li><a href="#">Create Liquidity</a></li>
+                        <li><a href="#">FAQs</a></li>
+                    </ul>
+                </nav>
+            </aside>
+        </div>
+    </div>
+
+    <!-- JavaScript Files -->
     <script src="scripts.js"></script>
+    <script src="functions/createToken.js"></script>
 </body>
 </html>
