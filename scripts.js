@@ -33,14 +33,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
         try {
             const response = await createToken(tokenData);
-            alert(`🎉 Token Created Successfully: ${response.txId}`);
+            alert(`🎉 Token Created Successfully: ${response.mintAddress}`);
         } catch (error) {
             console.error("❌ Error creating token:", error);
             alert("⚠️ Failed to create token. Check console for details.");
         }
     });
 });
-
 
 // Function to upload image to IPFS (Dummy implementation, replace with actual API)
 async function uploadImageToIPFS(imageFile) {
@@ -61,5 +60,22 @@ async function uploadImageToIPFS(imageFile) {
     } catch (error) {
         console.error("❌ IPFS Upload Failed:", error);
         return null;
+    }
+}
+
+// ✅ FIXED: Add the missing createToken function
+async function createToken(tokenData) {
+    try {
+        const response = await fetch("/.netlify/functions/createToken", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(tokenData),
+        });
+
+        const responseData = await response.json();
+        return responseData; // This will contain the token mint address
+    } catch (error) {
+        console.error("❌ API Error:", error);
+        throw new Error("Token creation failed.");
     }
 }
