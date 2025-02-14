@@ -48,3 +48,5 @@ exports.handler = async function (event) {
         };
     }
 };
+
+console.log("🔍 Solana Private Key Length:", process.env.SOLANA_PRIVATE_KEY ? process.env.SOLANA_PRIVATE_KEY.length : "NOT FOUND");
